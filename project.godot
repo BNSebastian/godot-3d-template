@@ -11,10 +11,18 @@ config_version=5
 [application]
 
 config/name="Template"
-run/main_scene="res://node_3d.tscn"
+run/main_scene="res://Levels/MainLevel.tscn"
 config/features=PackedStringArray("4.3", "C#", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://Assets/icon.svg"
 
 [dotnet]
 
 project/assembly_name="Template"
+
+[file_customization]
+
+folder_colors={
+"res://Assets/": "green",
+"res://Scenes/": "orange",
+"res://Scripts/": "blue"
+}
