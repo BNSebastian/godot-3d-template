@@ -5,6 +5,12 @@ namespace Template.Scripts.Characters.Players;
 
 public partial class Player : CharacterBody3D
 {
+    public const float Speed = 5.0f; // Speed of the player's movement
+    public const float JumpVelocity = 4.5f; // Velocity applied when the player jumps
+    private Vector3 _attackDirection = Vector3.Zero; // stores the direction the player moves when attacking
+
+    // Stores the x/y direction the player is looking in (mouse/controller input)
+    private Vector2 _look = Vector2.Zero;
     [Export] public SpringArm3D SpringArm { get; set; } // Camera spring arm for smooth camera movement
     [Export] public float MouseSensitivity { get; set; } = 0.00075f; // Sensitivity for mouse look
     [Export] public float MinBoundary { get; set; } = -60f; // Minimum vertical angle for camera rotation
@@ -17,13 +23,6 @@ public partial class Player : CharacterBody3D
 
     [Export] public AttackCast AttackCast { get; set; }
     [Export] public float AttackMoveSpeed { get; set; } = 3.0f;
-    
-    public const float Speed = 5.0f; // Speed of the player's movement
-    public const float JumpVelocity = 4.5f; // Velocity applied when the player jumps
-
-    // Stores the x/y direction the player is looking in (mouse/controller input)
-    private Vector2 _look = Vector2.Zero;
-    private Vector3 _attackDirection = Vector3.Zero; // stores the direction the player moves when attacking
 
     public override void _Ready()
     {
@@ -43,7 +42,7 @@ public partial class Player : CharacterBody3D
         Rig.UpdateAnimationTree(direction);
         // Update the player's velocity and move the character
         Velocity = velocity;
-        
+
         HandleIdlePhysicsFrame(delta, direction);
         HandleSlashingPhysicsFrame(delta);
         if (!IsOnFloor()) velocity += GetGravity() * (float)delta; // Apply gravity if the player is not on the floor
@@ -89,12 +88,8 @@ public partial class Player : CharacterBody3D
                 _look = -mouseMotion.Relative * MouseSensitivity; // Update look direction based on mouse movement
 
         if (Rig.IsIdle())
-        {
             if (@event.IsActionPressed("click"))
-            {
                 SlashAttack();
-            }
-        }
     }
 
     private void LookTowardDirection(Vector3 direction, float delta)
@@ -109,35 +104,27 @@ public partial class Player : CharacterBody3D
     // Placeholder method for a slash attack (to be implemented)
     public void SlashAttack()
     {
-       Rig.Travel("Slash"); 
-       _attackDirection = GetMovementDirection();
-       if (_attackDirection.IsZeroApprox())
-       {
-           _attackDirection = Rig.GlobalBasis * Vector3.Back;
-       }
+        Rig.Travel("Slash");
+        _attackDirection = GetMovementDirection();
+        if (_attackDirection.IsZeroApprox()) _attackDirection = Rig.GlobalBasis * Vector3.Back;
+        // clear the exception in the raycast if it hit an object so it can hit it again
+        AttackCast.ClearExceptions();
     }
 
     public void HandleSlashingPhysicsFrame(double delta)
     {
-        if (!Rig.IsSlashing())
-        {
-            return;
-        }
+        if (!Rig.IsSlashing()) return;
 
         Velocity = new Vector3(_attackDirection.X * AttackMoveSpeed, 0, _attackDirection.Z * AttackMoveSpeed);
         LookTowardDirection(_attackDirection, (float)delta);
-        
-            AttackCast.DealDamage();
-        
+
+        AttackCast.DealDamage();
     }
 
     public void HandleIdlePhysicsFrame(double delta, Vector3 direction)
     {
-        if (!Rig.IsIdle())
-        {
-            return;
-        }
-        
+        if (!Rig.IsIdle()) return;
+
         var velocity = Velocity;
         // Apply movement if there is a direction input
         if (direction != Vector3.Zero)
@@ -151,7 +138,8 @@ public partial class Player : CharacterBody3D
             // Decelerate the player when there is no input
             velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
             velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
-        } 
+        }
+
         Velocity = velocity;
     }
 }

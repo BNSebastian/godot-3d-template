@@ -7,7 +7,9 @@ public partial class Rig : Node3D
     [Export] public AnimationTree AnimationTree { get; set; }
     [Export] public float AnimationSpeed { get; set; }
     [Export] public AnimationNodeStateMachinePlayback Playback { get; set; }
-
+    [Export] public Skeleton3D Skeleton { get; set; }
+    [Export] public MeshInstance3D[] VillagerMeshes { get; set; }
+    
     private float _runWeighTarget = -1.0f;
     private string _runPath = "parameters/MoveSpace/blend_position";
 
@@ -64,5 +66,17 @@ public partial class Rig : Node3D
     {
         // MoveSpace is the blend space in the animation tree
         return Playback.GetCurrentNode().Equals("Slash");
+    }
+
+    public void SetActiveMesh(MeshInstance3D activeMesh)
+    {
+        foreach (var child in Skeleton.GetChildren())
+        {
+            if (child is MeshInstance3D mesh)
+            {
+                mesh.SetVisible(false);
+            }
+        }
+        activeMesh.SetVisible(true);
     }
 }
