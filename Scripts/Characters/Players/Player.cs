@@ -1,5 +1,10 @@
+using System.Numerics;
 using Godot;
 using Template.Scripts.Animations;
+using Template.Scripts.Characters.Abilities;
+using Template.Scripts.Managers;
+using Vector2 = Godot.Vector2;
+using Vector3 = Godot.Vector3;
 
 namespace Template.Scripts.Characters.Players;
 
@@ -24,10 +29,36 @@ public partial class Player : CharacterBody3D
     [Export] public AttackCast AttackCast { get; set; }
     [Export] public float AttackMoveSpeed { get; set; } = 3.0f;
 
+    [ExportCategory("Health")]
+    /****************************************/
+    [Export]
+    public HealthComponent HealthComponent { get; set; }
+    [Export] 
+    public int MaxHealth { get; set; } = 100;
+    [Export]
+    public CollisionShape3D CollisionShape { get; set; }
+
+    [ExportCategory("Attacks")]
+    /****************************************/
+    [Export]
+    public AreaAttack AreaAttack { get; set; }
+    [Export] 
+    public int HeavyAttackDamage { get; set; } = 100;
+    
     public override void _Ready()
     {
         // Capture the mouse so it doesn't leave the game window
         Input.MouseMode = Input.MouseModeEnum.Captured;
+        
+        HealthComponent.UpdateMaxHealth(MaxHealth);
+        HealthComponent.Defeat += OnHealthComponentDefeated;
+
+        Rig.HeavyAttack += OnRigHeavyAttack;
+    }
+
+    private void OnRigHeavyAttack()
+    {
+        AreaAttack.DealDamage(HeavyAttackDamage);
     }
 
     public override void _PhysicsProcess(double delta)
@@ -45,11 +76,12 @@ public partial class Player : CharacterBody3D
 
         HandleIdlePhysicsFrame(delta, direction);
         HandleSlashingPhysicsFrame(delta);
+        HandleOverheadPhysicsFrame(delta);
         if (!IsOnFloor()) velocity += GetGravity() * (float)delta; // Apply gravity if the player is not on the floor
         MoveAndSlide();
     }
 
-    private Vector3 GetMovementDirection()
+    public Vector3 GetMovementDirection()
     {
         // Get input direction from the player (WASD or controller)
         var inputDirection = Input.GetVector("move_left", "move_right", "move_forward", "move_back");
@@ -88,8 +120,17 @@ public partial class Player : CharacterBody3D
                 _look = -mouseMotion.Relative * MouseSensitivity; // Update look direction based on mouse movement
 
         if (Rig.IsIdle())
+        {
             if (@event.IsActionPressed("click"))
+            {
                 SlashAttack();
+            }
+
+            if (@event.IsActionPressed("right_click"))
+            {
+                HeavyAttack();
+            }
+        }
     }
 
     private void LookTowardDirection(Vector3 direction, float delta)
@@ -111,6 +152,14 @@ public partial class Player : CharacterBody3D
         AttackCast.ClearExceptions();
     }
 
+    public void HeavyAttack()
+    {
+        Rig.Travel("Overhead");
+        _attackDirection = GetMovementDirection();
+        if (_attackDirection.IsZeroApprox()) _attackDirection = Rig.GlobalBasis * Vector3.Back;
+        AttackCast.ClearExceptions();
+    }
+
     public void HandleSlashingPhysicsFrame(double delta)
     {
         if (!Rig.IsSlashing()) return;
@@ -119,6 +168,12 @@ public partial class Player : CharacterBody3D
         LookTowardDirection(_attackDirection, (float)delta);
 
         AttackCast.DealDamage();
+    }
+    
+    public void HandleOverheadPhysicsFrame(double delta)
+    {
+        if (!Rig.IsOverhead()) return;
+        Velocity = Vector3.Zero;
     }
 
     public void HandleIdlePhysicsFrame(double delta, Vector3 direction)
@@ -142,4 +197,12 @@ public partial class Player : CharacterBody3D
 
         Velocity = velocity;
     }
+    
+    private void OnHealthComponentDefeated()
+    {
+        Rig.Travel("Defeat");
+        CollisionShape.Disabled = true;
+        SetPhysicsProcess(false);
+        //QueueFree();
+    } 
 }

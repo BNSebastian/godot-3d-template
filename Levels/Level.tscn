@@ -1,11 +1,11 @@
 [gd_scene load_steps=11 format=3 uid="uid://bjayu3k4eu04c"]
 
-[ext_resource type="PackedScene" uid="uid://mhj7u0g04rsf" path="res://Scenes/Characters/Player/Player.tscn" id="1_b318w"]
+[ext_resource type="PackedScene" uid="uid://mhj7u0g04rsf" path="res://Scenes/Characters/PCs/Player.tscn" id="1_b318w"]
 [ext_resource type="PackedScene" uid="uid://xmi1lmtievg5" path="res://Assets/Environment/Rock_Cliff_Env_03.glb" id="2_nac7e"]
 [ext_resource type="PackedScene" uid="uid://hmtm56qblckb" path="res://Assets/Environment/Topiary_Tree_Vege_01.glb" id="3_mrit6"]
 [ext_resource type="PackedScene" uid="uid://cmx4urdbc07c0" path="res://Assets/Environment/Tree_Group_Vege.glb" id="4_xejag"]
 [ext_resource type="PackedScene" uid="uid://bini6bo7v15cn" path="res://Assets/Environment/Bush_Vege_2.glb" id="5_yisjq"]
-[ext_resource type="PackedScene" uid="uid://bv8xk8kfvwx0r" path="res://Scenes/Characters/NPCs/enemy.tscn" id="6_ufndi"]
+[ext_resource type="PackedScene" uid="uid://bv8xk8kfvwx0r" path="res://Scenes/Characters/NPCs/Enemy.tscn" id="6_ufndi"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1q18m"]
 sky_top_color = Color(0.420834, 0.775294, 0.833111, 1)
@@ -112,10 +112,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.30407, 0, 17.5685)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.15555, 0, 17.0748)
 
 [node name="Enemy" parent="." instance=ExtResource("6_ufndi")]
-transform = Transform3D(-0.123255, 0, -0.992375, 0, 1, 0, 0.992375, 0, -0.123255, 7.23238, 0.445494, 3.81851)
+transform = Transform3D(-0.123255, 0, -0.992375, 0, 1, 0, 0.992375, 0, -0.123255, 7.23238, 1.04294, 3.81851)
 
 [node name="Enemy2" parent="." instance=ExtResource("6_ufndi")]
-transform = Transform3D(0.72164, 0, -0.692269, 0, 1, 0, 0.692269, 0, 0.72164, 7.49198, 0.445494, -2.35494)
+transform = Transform3D(0.72164, 0, -0.692269, 0, 1, 0, 0.692269, 0, 0.72164, 7.49198, 1.04294, -2.35494)
 
 [node name="Enemy3" parent="." instance=ExtResource("6_ufndi")]
-transform = Transform3D(0.72164, 0, -0.692269, 0, 1, 0, 0.692269, 0, 0.72164, 2.95242, 0.445494, -11.5078)
+transform = Transform3D(0.72164, 0, -0.692269, 0, 1, 0, 0.692269, 0, 0.72164, 2.95242, 1.04294, -11.5078)

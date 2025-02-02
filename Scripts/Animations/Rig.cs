@@ -10,6 +10,9 @@ public partial class Rig : Node3D
     [Export] public Skeleton3D Skeleton { get; set; }
     [Export] public MeshInstance3D[] VillagerMeshes { get; set; }
     
+    [Signal]
+    public delegate void HeavyAttackEventHandler();
+    
     private float _runWeighTarget = -1.0f;
     private string _runPath = "parameters/MoveSpace/blend_position";
 
@@ -68,6 +71,12 @@ public partial class Rig : Node3D
         return Playback.GetCurrentNode().Equals("Slash");
     }
 
+    public bool IsOverhead()
+    {
+        // MoveSpace is the blend space in the animation tree
+        return Playback.GetCurrentNode().Equals("Overhead");
+    }
+    
     public void SetActiveMesh(MeshInstance3D activeMesh)
     {
         foreach (var child in Skeleton.GetChildren())
@@ -78,5 +87,13 @@ public partial class Rig : Node3D
             }
         }
         activeMesh.SetVisible(true);
+    }
+
+    public void OnAnimationTreeAnimationFinished(string animationName)
+    {
+        if (animationName.Equals("Overhead"))
+        {
+            EmitSignal(nameof(HeavyAttack));
+        }
     }
 }
