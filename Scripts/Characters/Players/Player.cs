@@ -3,6 +3,7 @@ using Godot;
 using Template.Scripts.Animations;
 using Template.Scripts.Characters.Abilities;
 using Template.Scripts.Managers;
+using Template.Scripts.Resources;
 using Vector2 = Godot.Vector2;
 using Vector3 = Godot.Vector3;
 
@@ -12,6 +13,8 @@ public partial class Player : CharacterBody3D
 {
     public const float Speed = 5.0f; // Speed of the player's movement
     public const float JumpVelocity = 4.5f; // Velocity applied when the player jumps
+    public const float Decay = 8.0f;
+    
     private Vector3 _attackDirection = Vector3.Zero; // stores the direction the player moves when attacking
 
     // Stores the x/y direction the player is looking in (mouse/controller input)
@@ -29,6 +32,11 @@ public partial class Player : CharacterBody3D
     [Export] public AttackCast AttackCast { get; set; }
     [Export] public float AttackMoveSpeed { get; set; } = 3.0f;
 
+    [ExportCategory("Stats")]
+    /****************************************/
+    [Export]
+    public CharacterStats Stats { get; set; } 
+    
     [ExportCategory("Health")]
     /****************************************/
     [Export]
@@ -178,21 +186,28 @@ public partial class Player : CharacterBody3D
 
     public void HandleIdlePhysicsFrame(double delta, Vector3 direction)
     {
-        if (!Rig.IsIdle()) return;
+        if (!Rig.IsIdle() && !Rig.IsDashing())
+        {
+            
+            return;
+        }
 
         var velocity = Velocity;
+        velocity.X = ExponentialDecay(velocity.X, direction.X * Speed, Decay, (float)delta);
+        velocity.Z = ExponentialDecay(velocity.Z, direction.Z * Speed, Decay, (float)delta);
+        
         // Apply movement if there is a direction input
         if (direction != Vector3.Zero)
         {
-            velocity.X = direction.X * Speed; // Move along the X-axis
-            velocity.Z = direction.Z * Speed; // Move along the Z-axis
+            /*velocity.X = direction.X * Speed; // Move along the X-axis
+            velocity.Z = direction.Z * Speed; // Move along the Z-axis*/
             LookTowardDirection(direction, (float)delta); // Smoothly rotate the character toward the movement direction
         }
         else
         {
             // Decelerate the player when there is no input
-            velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
-            velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
+            /*velocity.X = Mathf.MoveToward(Velocity.X, 0, Speed);
+            velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);*/
         }
 
         Velocity = velocity;
@@ -204,5 +219,10 @@ public partial class Player : CharacterBody3D
         CollisionShape.Disabled = true;
         SetPhysicsProcess(false);
         //QueueFree();
-    } 
+    }
+
+    public float ExponentialDecay(float a, float b, float decay, float delta)
+    {
+        return b + (b - a) * Mathf.Exp(-decay * delta);
+    }
 }

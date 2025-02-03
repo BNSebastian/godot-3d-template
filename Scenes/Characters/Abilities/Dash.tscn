@@ -1,12 +1,42 @@
-[gd_scene load_steps=2 format=3 uid="uid://kc7ss02qveji"]
+[gd_scene load_steps=7 format=3 uid="uid://kc7ss02qveji"]
 
 [ext_resource type="Script" path="res://Scripts/Characters/Abilities/Dash.cs" id="1_phibn"]
 
-[node name="Dash" type="Node3D" node_paths=PackedStringArray("Timer")]
+[sub_resource type="Curve" id="Curve_c8kvl"]
+_data = [Vector2(0.0466926, 0.241491), 0.0, 0.0, 0, 0, Vector2(0.143969, 0.620746), 0.0, 0.0, 0, 0, Vector2(1, 0.0202594), -2.60718, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_vgv47"]
+curve = SubResource("Curve_c8kvl")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_0q11n"]
+emission_shape_scale = Vector3(1, 0.25, 1)
+emission_shape = 1
+emission_sphere_radius = 0.5
+gravity = Vector3(0, 1, 0)
+damping_max = 1.0
+scale_min = 0.2
+scale_max = 0.4
+scale_curve = SubResource("CurveTexture_vgv47")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_he7ae"]
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_kojs3"]
+material = SubResource("StandardMaterial3D_he7ae")
+
+[node name="Dash" type="Node3D"]
 script = ExtResource("1_phibn")
-Timer = NodePath("Timer")
 
 [node name="Timer" type="Timer" parent="."]
 one_shot = true
 
-[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+[node name="Particles" type="GPUParticles3D" parent="."]
+cast_shadow = 0
+emitting = false
+amount = 13
+lifetime = 0.5
+process_material = SubResource("ParticleProcessMaterial_0q11n")
+draw_pass_1 = SubResource("SphereMesh_kojs3")

@@ -8,15 +8,49 @@ public partial class Dash : Node3D
     [Export] 
     private Player Player { get; set; }
     [Export]
-    private Timer Timer {get; set;}
+    private double AbilityCooldown { get; set; } = 1;
     [Export]
-    private int Cooldown { get; set; } = 1;
-
+    private double AbilityDuration { get; set; } = 0.3;
+    [Export]
+    private float DashSpeed { get; set; } = 3.0f;
+    
+    private Timer _timer;
+    private double _timeRemaining;
+    private GpuParticles3D _particles;
     private Vector3 _direction = Vector3.Zero;
+
+    public override void _Ready()
+    {
+       _timer = GetNode<Timer>("Timer"); 
+       _particles = GetNode<GpuParticles3D>("Particles");
+    }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        if (_direction.IsZeroApprox())
+        {
+            return;
+        }
+        
+        Player.Velocity = _direction * Player.Speed * DashSpeed;
+        
+        _timeRemaining -= delta;
+        
+        if (_timeRemaining <= 0)
+        {
+            _direction = Vector3.Zero;
+            _particles.Emitting = false;
+        }
+    }
     
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (!Timer.IsStopped())
+        if (!_timer.IsStopped())
+        {
+            return;
+        }
+
+        if (!Player.IsPhysicsProcessing())
         {
             return;
         }
@@ -27,9 +61,12 @@ public partial class Dash : Node3D
 
             if (!_direction.IsZeroApprox())
             {
-                GD.Print("We can dash");
+                Player.Rig.Travel("Dash");
+                _particles.Emitting = true;
+                _timer.Start(AbilityCooldown);
+                _timeRemaining = AbilityDuration;
             }
-            Timer.Start(Cooldown);
+            _timer.Start(AbilityCooldown);
         }
     }
 }

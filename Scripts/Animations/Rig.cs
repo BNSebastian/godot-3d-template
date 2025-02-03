@@ -74,7 +74,13 @@ public partial class Rig : Node3D
     public bool IsOverhead()
     {
         // MoveSpace is the blend space in the animation tree
-        return Playback.GetCurrentNode().Equals("Overhead");
+        return Playback.GetCurrentNode().Equals("Overhead") ||
+               Playback.GetCurrentNode().Equals("OverheadRecover");
+    }
+    
+    public bool IsDashing()
+    {
+        return Playback.GetCurrentNode().Equals("Dash");
     }
     
     public void SetActiveMesh(MeshInstance3D activeMesh)
@@ -96,4 +102,6 @@ public partial class Rig : Node3D
             EmitSignal(nameof(HeavyAttack));
         }
     }
+
+
 }
