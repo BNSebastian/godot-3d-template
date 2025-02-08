@@ -7,8 +7,8 @@ public partial class Dash : Node3D
 {
     [Export] 
     private Player Player { get; set; }
-    [Export]
-    private double AbilityCooldown { get; set; } = 1;
+    //[Export]
+    //private double AbilityCooldown { get; set; } = 1;
     [Export]
     private double AbilityDuration { get; set; } = 0.3;
     [Export]
@@ -32,7 +32,7 @@ public partial class Dash : Node3D
             return;
         }
         
-        Player.Velocity = _direction * Player.Speed * DashSpeed;
+        Player.Velocity = -_direction * Player.Stats.GetBaseSpeed() * DashSpeed;
         
         _timeRemaining -= delta;
         
@@ -63,10 +63,10 @@ public partial class Dash : Node3D
             {
                 Player.Rig.Travel("Dash");
                 _particles.Emitting = true;
-                _timer.Start(AbilityCooldown);
+                _timer.Start(Player.Stats.GetDashCooldown());
                 _timeRemaining = AbilityDuration;
             }
-            _timer.Start(AbilityCooldown);
+            _timer.Start(Player.Stats.GetDashCooldown());
         }
     }
 }

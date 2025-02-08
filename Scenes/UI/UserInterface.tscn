@@ -1,0 +1,111 @@
+[gd_scene load_steps=9 format=3 uid="uid://dill0y6lenoao"]
+
+[ext_resource type="Texture2D" uid="uid://cq3pjjeu0l14m" path="res://Assets/UI/PNG/Red/Default/button_rectangle_flat.png" id="1_3ue5k"]
+[ext_resource type="Script" path="res://Scripts/UI/UserInterface.cs" id="1_5cky8"]
+[ext_resource type="Texture2D" uid="uid://c842xya3bcm45" path="res://Assets/UI/PNG/Blue/Default/button_rectangle_depth_flat.png" id="2_1blew"]
+[ext_resource type="Texture2D" uid="uid://cbs2eqjgu06j5" path="res://Assets/UI/PNG/Grey/Default/button_rectangle_flat.png" id="2_khf3w"]
+[ext_resource type="FontFile" uid="uid://do3rpnrsiin5j" path="res://Assets/UI/Font/Kenney Future.ttf" id="3_x8jqf"]
+[ext_resource type="Texture2D" uid="uid://dcolfmwftexft" path="res://Assets/UI/PNG/Green/Default/button_rectangle_flat.png" id="4_03g7w"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_c7yey"]
+font = ExtResource("3_x8jqf")
+font_size = 15
+font_color = Color(0, 0, 0, 1)
+
+[sub_resource type="LabelSettings" id="LabelSettings_o8hqs"]
+line_spacing = 5.0
+font = ExtResource("3_x8jqf")
+font_size = 50
+outline_size = 5
+outline_color = Color(0, 0, 0, 1)
+shadow_size = 0
+shadow_color = Color(0, 0, 0, 1)
+shadow_offset = Vector2(8.03, 1.57)
+
+[node name="UserInterface" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_5cky8")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="InfoBar" type="Control" parent="MarginContainer"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="HealthBarBackground" type="TextureRect" parent="MarginContainer/InfoBar"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture = ExtResource("2_khf3w")
+
+[node name="HealthBar" type="TextureProgressBar" parent="MarginContainer/InfoBar/HealthBarBackground"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture_progress = ExtResource("1_3ue5k")
+
+[node name="HealthLabel" type="Label" parent="MarginContainer/InfoBar/HealthBarBackground/HealthBar"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = 11.0
+offset_top = -11.0
+offset_right = 107.0
+offset_bottom = 12.0
+grow_vertical = 2
+text = "1000/1000"
+label_settings = SubResource("LabelSettings_c7yey")
+
+[node name="ExperienceBar" type="TextureProgressBar" parent="MarginContainer/InfoBar/HealthBarBackground"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_top = 64.0
+offset_right = 192.0
+offset_bottom = 128.0
+scale = Vector2(1, 0.16)
+texture_progress = ExtResource("4_03g7w")
+
+[node name="LevelBackground" type="TextureRect" parent="MarginContainer/InfoBar"]
+layout_mode = 0
+offset_left = 194.0
+offset_top = 1.0
+offset_right = 450.0
+offset_bottom = 65.0
+scale = Vector2(0.170248, 0.465181)
+texture = ExtResource("2_1blew")
+
+[node name="LevelLabel" type="Label" parent="MarginContainer/InfoBar/LevelBackground"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(95, 0)
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 9.0
+offset_right = 240.0
+offset_bottom = -11.0
+grow_vertical = 2
+text = "12"
+label_settings = SubResource("LabelSettings_o8hqs")
+horizontal_alignment = 1
+vertical_alignment = 1

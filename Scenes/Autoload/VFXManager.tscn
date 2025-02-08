@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://dnjva1efl6tay"]
+
+[node name="VFXManager" type="Node3D"]

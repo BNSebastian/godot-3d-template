@@ -19,7 +19,7 @@ public partial class Enemy : CharacterBody3D
 	[Export]
 	public HealthComponent HealthComponent { get; set; }
 	[Export] 
-	public int MaxHealth { get; set; } = 100;
+	public int MaxHealth { get; set; } = 30;
 
 	[ExportCategory("Attacks")]
 	[Export]
@@ -28,9 +28,18 @@ public partial class Enemy : CharacterBody3D
 	public AreaAttack AreaAttack { get; set; }
 	[Export] 
 	public int Damage { get; set; } = 15;
+
+	[ExportCategory("Mechanics")]
+	[Export] 
+	public int XpValue { get; set; } = 100;
+	
+	private Player Player { get; set; }
 	
 	public override void _Ready()
 	{
+		// check the node tree for the node that is in the Player group
+		Player = GetTree().GetFirstNodeInGroup("PlayerGroup") as Player;
+		
 		Random random = new Random();
 		Rig.SetActiveMesh(Rig.VillagerMeshes[random.Next(Rig.VillagerMeshes.Length)]);
 		HealthComponent.UpdateMaxHealth(MaxHealth);
@@ -67,6 +76,7 @@ public partial class Enemy : CharacterBody3D
 
 	private void OnHealthComponentDefeated()
 	{
+		Player.Stats.Xp += XpValue;
 		Rig.Travel("Defeat");
 		CollisionShape.Disabled = true;
 		SetPhysicsProcess(false);
@@ -76,7 +86,7 @@ public partial class Enemy : CharacterBody3D
 	public void OnRigHeavyAttack()
 	{
 		GD.Print("heavy attack signal");
-		AreaAttack.DealDamage(Damage);
+		AreaAttack.DealDamage(Damage, 0.0f);
 	}
 
 }

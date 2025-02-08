@@ -1,4 +1,3 @@
-using System.Numerics;
 using Godot;
 using Template.Scripts.Animations;
 using Template.Scripts.Characters.Abilities;
@@ -11,7 +10,6 @@ namespace Template.Scripts.Characters.Players;
 
 public partial class Player : CharacterBody3D
 {
-    public const float Speed = 5.0f; // Speed of the player's movement
     public const float JumpVelocity = 4.5f; // Velocity applied when the player jumps
     public const float Decay = 8.0f;
     
@@ -29,13 +27,13 @@ public partial class Player : CharacterBody3D
     [Export] public float AnimationDecay { get; set; } = 20f; // Smoothing factor for character rotation
     [Export] public Rig Rig { get; set; } // Reference to the Rig component for animations
 
-    [Export] public AttackCast AttackCast { get; set; }
+    [Export] public Abilities.AttackCast AttackCast { get; set; }
     [Export] public float AttackMoveSpeed { get; set; } = 3.0f;
 
     [ExportCategory("Stats")]
     /****************************************/
     [Export]
-    public CharacterStats Stats { get; set; } 
+    public CharacterStats Stats { get; set; } = new CharacterStats();
     
     [ExportCategory("Health")]
     /****************************************/
@@ -51,22 +49,30 @@ public partial class Player : CharacterBody3D
     [Export]
     public AreaAttack AreaAttack { get; set; }
     [Export] 
-    public int HeavyAttackDamage { get; set; } = 100;
+    public int HeavyAttackDamage { get; set; } = 20;
     
     public override void _Ready()
     {
         // Capture the mouse so it doesn't leave the game window
         Input.MouseMode = Input.MouseModeEnum.Captured;
+
+        Stats.LevelUpNotification += () =>
+        {
+            HealthComponent.UpdateMaxHealth(Stats.GetMaxHp());
+            GD.Print("Max HP: " + Stats.GetMaxHp());
+        };
         
         HealthComponent.UpdateMaxHealth(MaxHealth);
         HealthComponent.Defeat += OnHealthComponentDefeated;
 
         Rig.HeavyAttack += OnRigHeavyAttack;
-    }
 
+        GD.Print(Stats.GetBaseSpeed());
+    }
+    
     private void OnRigHeavyAttack()
     {
-        AreaAttack.DealDamage(HeavyAttackDamage);
+        AreaAttack.DealDamage(HeavyAttackDamage + (int)Stats.GetDamageModifier(), Stats.GetCritChance());
     }
 
     public override void _PhysicsProcess(double delta)
@@ -150,12 +156,17 @@ public partial class Player : CharacterBody3D
             RigPivot.GlobalTransform.InterpolateWith(targetTransform, 1.0f - Mathf.Exp(-AnimationDecay * delta));
     }
 
-    // Placeholder method for a slash attack (to be implemented)
     public void SlashAttack()
     {
         Rig.Travel("Slash");
+        
         _attackDirection = GetMovementDirection();
-        if (_attackDirection.IsZeroApprox()) _attackDirection = Rig.GlobalBasis * Vector3.Back;
+
+        if (_attackDirection.IsZeroApprox())
+        {
+            _attackDirection = Rig.GlobalBasis * Vector3.Back;
+        }
+        
         // clear the exception in the raycast if it hit an object so it can hit it again
         AttackCast.ClearExceptions();
     }
@@ -163,9 +174,13 @@ public partial class Player : CharacterBody3D
     public void HeavyAttack()
     {
         Rig.Travel("Overhead");
+        
         _attackDirection = GetMovementDirection();
-        if (_attackDirection.IsZeroApprox()) _attackDirection = Rig.GlobalBasis * Vector3.Back;
-        AttackCast.ClearExceptions();
+        
+        if (_attackDirection.IsZeroApprox())
+        {
+            _attackDirection = Rig.GlobalBasis * Vector3.Back;
+        }
     }
 
     public void HandleSlashingPhysicsFrame(double delta)
@@ -175,7 +190,7 @@ public partial class Player : CharacterBody3D
         Velocity = new Vector3(_attackDirection.X * AttackMoveSpeed, 0, _attackDirection.Z * AttackMoveSpeed);
         LookTowardDirection(_attackDirection, (float)delta);
 
-        AttackCast.DealDamage();
+        AttackCast.DealDamage((int)Stats.GetDamageModifier() + 10, Stats.GetCritChance());
     }
     
     public void HandleOverheadPhysicsFrame(double delta)
@@ -193,8 +208,8 @@ public partial class Player : CharacterBody3D
         }
 
         var velocity = Velocity;
-        velocity.X = ExponentialDecay(velocity.X, direction.X * Speed, Decay, (float)delta);
-        velocity.Z = ExponentialDecay(velocity.Z, direction.Z * Speed, Decay, (float)delta);
+        velocity.X = ExponentialDecay(velocity.X, direction.X * Stats.GetBaseSpeed(), Decay, (float)delta);
+        velocity.Z = ExponentialDecay(velocity.Z, direction.Z * Stats.GetBaseSpeed(), Decay, (float)delta);
         
         // Apply movement if there is a direction input
         if (direction != Vector3.Zero)
