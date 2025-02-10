@@ -85,13 +85,14 @@ public partial class Player : CharacterBody3D
         var direction = GetMovementDirection();
         // Update the animation tree in the Rig component based on the movement direction
         Rig.UpdateAnimationTree(direction);
+        // Apply gravity if the player is not on the floor
+        if (!IsOnFloor()) velocity += GetGravity() * (float)delta; 
         // Update the player's velocity and move the character
         Velocity = velocity;
 
         HandleIdlePhysicsFrame(delta, direction);
         HandleSlashingPhysicsFrame(delta);
         HandleOverheadPhysicsFrame(delta);
-        if (!IsOnFloor()) velocity += GetGravity() * (float)delta; // Apply gravity if the player is not on the floor
         MoveAndSlide();
     }
 

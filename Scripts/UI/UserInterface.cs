@@ -13,23 +13,46 @@ public partial class UserInterface : Control
     private Label _healthLabel;
     private TextureProgressBar _experienceBar;
 
+    private Inventory _inventory;
+    
     public override void _Ready()
     {
+        if (Player == null)
+        {
+            GD.PrintErr("Player node isn't set");
+        }
         _levelLabel = GetNode<Label>("%LevelLabel");
         _healthBar = GetNode<TextureProgressBar>("%HealthBar");
         _healthLabel = GetNode<Label>("%HealthLabel");
         _experienceBar = GetNode<TextureProgressBar>("%ExperienceBar");
-
-        Player.Stats.UpdateStats += UpdateStatsDisplay;
-        UpdateStatsDisplay(); // update the ui when the game loads
+        _inventory = GetNode<Inventory>("%Inventory");
         
+        UpdateStatsDisplay(); // update the ui when the game loads
+        Player.Stats.UpdateStats += UpdateStatsDisplay;
+        Player.Stats.UpdateStats += UpdateExperienceBar;
         Player.HealthComponent.HealthChanged += UpdateHealthBar;
         Player.HealthComponent.HealthChanged += UpdateHealthLabel;
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        if (@event.IsActionPressed("open_menu"))
+        {
+            if (_inventory.Visible)
+            {
+                CloseMenu();
+            }
+            else
+            {
+                OpenMenu();
+            }
+        }
     }
     
     public void UpdateStatsDisplay()
     {
         _levelLabel.Text = Player.Stats.Level.ToString();
+        _inventory.UpdateStats();
     }
 
     public void UpdateHealthBar()
@@ -48,6 +71,18 @@ public partial class UserInterface : Control
         _experienceBar.MaxValue = Player.Stats.CubicLevelUpBoundary();
         _experienceBar.Value = Player.Stats.Xp;
     }
-    
-    
+
+    public void OpenMenu()
+    {
+        _inventory.Visible = true;
+        GetTree().Paused = true;
+        Input.SetMouseMode(Input.MouseModeEnum.Visible);
+    }
+
+    public void CloseMenu()
+    {
+        _inventory.Visible = false;
+        GetTree().Paused = false;
+        Input.SetMouseMode(Input.MouseModeEnum.Captured);
+    }
 }

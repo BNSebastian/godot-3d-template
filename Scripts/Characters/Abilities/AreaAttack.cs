@@ -27,13 +27,13 @@ public partial class AreaAttack : ShapeCast3D
                 {
                     if (Debug) GD.Print("Dealing damage to player: ", damage);
                     player.HealthComponent.TakeDamage(damage, isCritical);
-                    AddException(player);
+                    //AddException(player);
                 }
                 else if (collider is Enemy enemy)
                 {
                     if (Debug)GD.Print("Dealing damage to enemy: ", damage);
                     enemy.HealthComponent.TakeDamage(damage, isCritical);
-                    AddException(enemy);
+                    //AddException(enemy);
                 }
             }
         }

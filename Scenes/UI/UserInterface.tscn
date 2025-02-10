@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dill0y6lenoao"]
+[gd_scene load_steps=10 format=3 uid="uid://dill0y6lenoao"]
 
 [ext_resource type="Texture2D" uid="uid://cq3pjjeu0l14m" path="res://Assets/UI/PNG/Red/Default/button_rectangle_flat.png" id="1_3ue5k"]
 [ext_resource type="Script" path="res://Scripts/UI/UserInterface.cs" id="1_5cky8"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cbs2eqjgu06j5" path="res://Assets/UI/PNG/Grey/Default/button_rectangle_flat.png" id="2_khf3w"]
 [ext_resource type="FontFile" uid="uid://do3rpnrsiin5j" path="res://Assets/UI/Font/Kenney Future.ttf" id="3_x8jqf"]
 [ext_resource type="Texture2D" uid="uid://dcolfmwftexft" path="res://Assets/UI/PNG/Green/Default/button_rectangle_flat.png" id="4_03g7w"]
+[ext_resource type="PackedScene" uid="uid://bqlq8lbcunk03" path="res://Scenes/UI/Inventory.tscn" id="7_r2dc7"]
 
 [sub_resource type="LabelSettings" id="LabelSettings_c7yey"]
 font = ExtResource("3_x8jqf")
@@ -23,6 +24,7 @@ shadow_color = Color(0, 0, 0, 1)
 shadow_offset = Vector2(8.03, 1.57)
 
 [node name="UserInterface" type="Control"]
+process_mode = 3
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -109,3 +111,9 @@ text = "12"
 label_settings = SubResource("LabelSettings_o8hqs")
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Inventory" parent="." node_paths=PackedStringArray("UserInterface") instance=ExtResource("7_r2dc7")]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+UserInterface = NodePath("..")

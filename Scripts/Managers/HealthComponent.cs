@@ -14,7 +14,7 @@ public partial class HealthComponent : Node
 	public PhysicsBody3D Body { get; set; }
 	
 	[Export]
-	public bool Debug {get; set;} = false;
+	public bool Debug {get; set;}
 	
 	public int MaxHealth { get; set; } = 100;
 	

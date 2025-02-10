@@ -13,8 +13,10 @@ public partial class Rig : Node3D
     [Signal]
     public delegate void HeavyAttackEventHandler();
     
-    private float _runWeighTarget = -1.0f;
+    public float RunWeighTarget { get; set; } = -1.0f;
     private string _runPath = "parameters/MoveSpace/blend_position";
+    private Node3D _shieldSlot;
+    private Node3D _weaponSlot;
 
     public override void _Ready()
     {
@@ -27,6 +29,9 @@ public partial class Rig : Node3D
         {
             GD.PrintErr("AnimationTree is not assigned!");
         }
+        
+        _shieldSlot = GetNode<Node3D>("%ShieldSlot");
+        _weaponSlot = GetNode<Node3D>("%WeaponSlot");
     }
 
     public override void _PhysicsProcess(double delta)
@@ -35,7 +40,7 @@ public partial class Rig : Node3D
         float currentValue = (float)AnimationTree.Get(_runPath);
 
         // Smoothly interpolate toward the target value
-        float animationValue = Mathf.MoveToward(currentValue, _runWeighTarget, (float)delta * AnimationSpeed);
+        float animationValue = Mathf.MoveToward(currentValue, RunWeighTarget, (float)delta * AnimationSpeed);
 
         // Update the blend position in the AnimationTree
         AnimationTree.Set(_runPath, animationValue);
@@ -46,11 +51,11 @@ public partial class Rig : Node3D
         // Update the target blend position based on movement direction
         if (direction.IsZeroApprox())
         {
-            _runWeighTarget = -1.0f;
+            RunWeighTarget = -1.0f;
         }
         else
         {
-            _runWeighTarget = 1.0f;
+            RunWeighTarget = 1.0f;
         }
     }
 
@@ -103,5 +108,25 @@ public partial class Rig : Node3D
         }
     }
 
+    public void ReplaceShield(PackedScene shieldScene)
+    {
+        foreach (var child in _shieldSlot.GetChildren())
+        {
+            child.QueueFree();
+        }
 
+        var newShield = shieldScene.Instantiate();
+        _shieldSlot.AddChild(newShield);
+    }
+
+    public void ReplaceWeapon(PackedScene weaponScene)
+    {
+        foreach (var child in _weaponSlot.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        var newShield = weaponScene.Instantiate();
+        _weaponSlot.AddChild(newShield);
+    }
 }
