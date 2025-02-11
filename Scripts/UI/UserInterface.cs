@@ -52,6 +52,7 @@ public partial class UserInterface : Control
     public void UpdateStatsDisplay()
     {
         _levelLabel.Text = Player.Stats.Level.ToString();
+        // test, delete it afterwards
         _inventory.UpdateStats();
     }
 
